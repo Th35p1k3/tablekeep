@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { beforeAll, describe, expect, it } from "vitest";
 
-// Uses the two throwaway test accounts from .env.local (see docs/SETUP.md).
+// Uses the throwaway test accounts from .env.local (see docs/SETUP.md).
 // Skipped automatically when those settings are missing.
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
@@ -13,8 +13,19 @@ const userB = {
   email: process.env.TEST_USER_B_EMAIL,
   password: process.env.TEST_USER_B_PASSWORD,
 };
+const userC = {
+  email: process.env.TEST_USER_C_EMAIL,
+  password: process.env.TEST_USER_C_PASSWORD,
+};
 const ready = Boolean(
-  url && key && userA.email && userA.password && userB.email && userB.password,
+  url &&
+    key &&
+    userA.email &&
+    userA.password &&
+    userB.email &&
+    userB.password &&
+    userC.email &&
+    userC.password,
 );
 
 function newClient() {
@@ -35,19 +46,24 @@ async function signedIn(email: string, password: string) {
   return { client, userId: data.user.id };
 }
 
-describe.skipIf(!ready)("profile security with two test users", () => {
+describe.skipIf(!ready)("profile security with test users", () => {
   let a: Awaited<ReturnType<typeof signedIn>>;
   let b: Awaited<ReturnType<typeof signedIn>>;
+  let c: Awaited<ReturnType<typeof signedIn>>;
 
   beforeAll(async () => {
     a = await signedIn(userA.email!, userA.password!);
     b = await signedIn(userB.email!, userB.password!);
+    c = await signedIn(userC.email!, userC.password!);
   });
 
-  it("a user can read only their own profile", async () => {
+  it("a user sees their own profile but not a stranger's", async () => {
+    // Test C never shares a campaign with anyone, so A must not see C.
     const { data, error } = await a.client.from("profiles").select("id");
     expect(error).toBeNull();
-    expect((data ?? []).map((row) => row.id)).toEqual([a.userId]);
+    const ids = (data ?? []).map((row) => row.id);
+    expect(ids).toContain(a.userId);
+    expect(ids).not.toContain(c.userId);
   });
 
   it("a user cannot rename someone else", async () => {

@@ -39,6 +39,7 @@ Record which ones you have run in the table below.
 | --- | --- | --- |
 | 0001_health_check.sql | | |
 | 0002_accounts.sql | | |
+| 0003_campaigns.sql | | |
 
 ## Environments
 
@@ -88,11 +89,20 @@ four values in `.env.local`:
 | --- | --- |
 | `TEST_USER_A_EMAIL` / `TEST_USER_A_PASSWORD` | first test account |
 | `TEST_USER_B_EMAIL` / `TEST_USER_B_PASSWORD` | second test account |
+| `TEST_USER_C_EMAIL` / `TEST_USER_C_PASSWORD` | third test account: the "outsider". Never add it to a campaign by hand. |
 
 Use made-up passwords for these, never a real one.
 
 ## GitHub Actions secrets
 
 GitHub → repository → Settings → Secrets and variables → Actions →
-New repository secret. Add the same six names and values as `.env.local`.
+New repository secret. Add the same eight names and values as `.env.local`.
 Tests that need them are skipped if they're missing.
+
+## Test data notes (Phase 2)
+
+The automated tests create campaigns named `[test] ...` and delete them when
+they finish. If a test run is interrupted, a leftover `[test]` campaign may
+remain: log in as Test A and delete it from its Settings page. If Test C is
+left inside a campaign, the "stranger" security test will fail until it is
+removed.

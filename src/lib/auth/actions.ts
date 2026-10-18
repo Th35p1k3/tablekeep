@@ -1,8 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { friendlyCampaignError } from "@/lib/campaigns/errors";
+import { safeNextPath, siteOrigin } from "@/lib/origin";
 import { createClient } from "@/lib/supabase/server";
 import { type FormState, fieldErrorsFrom, textField } from "@/lib/forms";
 import {
@@ -14,18 +15,6 @@ import {
   signUpSchema,
 } from "@/lib/validation";
 import { friendlyAuthError, logUnexpectedAuthError } from "./errors";
-
-/** The address the visitor is using (localhost or the Vercel site). */
-async function siteOrigin(): Promise<string> {
-  const h = await headers();
-  const origin = h.get("origin");
-  if (origin) return origin;
-  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000";
-  const proto =
-    h.get("x-forwarded-proto") ??
-    (host.startsWith("localhost") ? "http" : "https");
-  return `${proto}://${host}`;
-}
 
 export async function signUp(
   _prev: FormState,
@@ -62,7 +51,11 @@ export async function signUp(
   }
 
   // With email confirmation off, Supabase signs the user in straight away.
-  redirect(data.session ? "/home" : "/signup/check-email");
+  redirect(
+    data.session
+      ? safeNextPath(textField(formData, "next"))
+      : "/signup/check-email",
+  );
 }
 
 export async function logIn(
@@ -88,12 +81,13 @@ export async function logIn(
     logUnexpectedAuthError("log in", error);
     return { status: "error", message: friendlyAuthError(error), values };
   }
-  redirect("/home");
+  redirect(safeNextPath(textField(formData, "next")));
 }
 
 export async function signOut(): Promise<void> {
   const supabase = await createClient();
-  await supabase.auth.signOut();
+  // "local" signs out only this browser, not the user's other devices.
+  await supabase.auth.signOut({ scope: "local" });
   redirect("/login");
 }
 
@@ -212,6 +206,9 @@ export async function deleteAccount(
   const supabase = await createClient();
   const { error } = await supabase.rpc("delete_my_account");
   if (error) {
+    if (error.message.includes("owns_campaigns")) {
+      return { status: "error", message: friendlyCampaignError(error) };
+    }
     console.error(`[account] delete failed: ${error.message}`);
     return {
       status: "error",

@@ -1,10 +1,8 @@
 import { expect, test } from "@playwright/test";
+import { testUsers } from "./helpers";
 
 const hasSupabase = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL);
-const testUser = {
-  email: process.env.TEST_USER_A_EMAIL ?? "",
-  password: process.env.TEST_USER_A_PASSWORD ?? "",
-};
+const testUser = testUsers.a;
 
 test("signed-out visitors are sent from Home to Log in", async ({ page }) => {
   test.skip(!hasSupabase, "needs Supabase settings");

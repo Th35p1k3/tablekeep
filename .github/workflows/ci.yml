@@ -18,6 +18,8 @@ jobs:
       TEST_USER_A_PASSWORD: ${{ secrets.TEST_USER_A_PASSWORD }}
       TEST_USER_B_EMAIL: ${{ secrets.TEST_USER_B_EMAIL }}
       TEST_USER_B_PASSWORD: ${{ secrets.TEST_USER_B_PASSWORD }}
+      TEST_USER_C_EMAIL: ${{ secrets.TEST_USER_C_EMAIL }}
+      TEST_USER_C_PASSWORD: ${{ secrets.TEST_USER_C_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

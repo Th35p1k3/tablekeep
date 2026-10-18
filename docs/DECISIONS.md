@@ -30,8 +30,9 @@ SQL files pasted into the Supabase SQL editor, tracked in SETUP.md. Revisit:
 switch to the Supabase CLI once there is more than one environment.
 
 ## ADR-008 Name and version numbers
-The app is called Tablekeep. Downloads are numbered 1.N.0, with N increasing
-by 1 per change; `VERSION`, `package.json` and `CHANGELOG.md` must agree.
+The app is called Tablekeep. Downloads were numbered 1.N.0 through Phase 1
+and are numbered 2.N.0 from Phase 2 (starting at 2.0.0), with N increasing by
+1 per change. `VERSION`, `package.json` and `CHANGELOG.md` must agree.
 
 ## ADR-009 Cache Components stay on
 New Next.js projects enable Cache Components. Pages are pre-built by default;
@@ -52,3 +53,20 @@ when the link is opened on a different device from the one used to sign up.
 
 ## ADR-013 Own small form components instead of shadcn/ui (for now)
 Five small components cover Phase 1. Revisit when screens get richer.
+
+## ADR-014 Game system is a text label for now
+Campaigns store `game_system` as plain text. A full `game_systems` table
+arrives with sheet templates in Phase 3, when something actually needs it.
+
+## ADR-015 Membership changes only through database functions
+Joining, role changes, removals, leaving, ownership transfer and deletion
+are database functions that check permissions themselves. Members can only
+read the membership table directly, never write it.
+
+## ADR-016 Invite links are hashed and shown once
+Only a SHA-256 hash of each invite token is stored, and nobody can read even
+the hash. The full link is shown once, right after it is created.
+
+## ADR-017 One owner per campaign
+Enforced by a unique index. Owners must hand over or delete their campaigns
+before leaving them or deleting their account.

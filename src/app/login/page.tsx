@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { LoginForm } from "@/components/auth-forms";
 import { AuthPage, linkClass } from "@/components/ui";
@@ -22,7 +23,9 @@ export default function LoginPage() {
         </div>
       }
     >
-      <LoginForm />
+      <Suspense fallback={<p>Loading…</p>}>
+        <LoginForm />
+      </Suspense>
     </AuthPage>
   );
 }

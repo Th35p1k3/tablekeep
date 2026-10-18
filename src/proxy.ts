@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
 // Pages that need a signed-in user. The pages check again themselves.
-const PROTECTED = ["/home", "/account"];
+const PROTECTED = ["/home", "/account", "/campaigns"];
 
 /**
  * Runs before every page request: keeps the login session fresh and sends

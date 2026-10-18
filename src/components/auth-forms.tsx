@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   deleteAccount,
   logIn,
@@ -12,10 +13,17 @@ import {
 import { idleState } from "@/lib/forms";
 import { Field, FormMessage, SubmitButton } from "./ui";
 
+/** Keeps "?next=" so an invite link survives logging in or signing up. */
+function NextField() {
+  const next = useSearchParams().get("next");
+  return next ? <input type="hidden" name="next" value={next} /> : null;
+}
+
 export function SignUpForm() {
   const [state, action, pending] = useActionState(signUp, idleState);
   return (
     <form action={action} className="space-y-4" noValidate>
+      <NextField />
       <Field
         label="Display name"
         name="displayName"
@@ -50,6 +58,7 @@ export function LoginForm() {
   const [state, action, pending] = useActionState(logIn, idleState);
   return (
     <form action={action} className="space-y-4" noValidate>
+      <NextField />
       <Field
         label="Email"
         name="email"

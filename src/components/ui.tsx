@@ -128,3 +128,66 @@ export function AuthPage({
 
 export const linkClass =
   "font-medium text-amber-800 underline underline-offset-4 hover:text-amber-900 dark:text-amber-500";
+
+export function TextAreaField({
+  label,
+  name,
+  defaultValue,
+  error,
+  hint,
+  rows = 4,
+}: {
+  label: string;
+  name: string;
+  defaultValue?: string;
+  error?: string;
+  hint?: string;
+  rows?: number;
+}) {
+  const id = `field-${name}`;
+  const errorId = `${id}-error`;
+  return (
+    <div className="space-y-1.5">
+      <label htmlFor={id} className="block text-sm font-medium">
+        {label}
+      </label>
+      <textarea
+        id={id}
+        name={name}
+        rows={rows}
+        defaultValue={defaultValue}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? errorId : undefined}
+        className={inputClass}
+      />
+      {hint && !error ? (
+        <p className="text-sm text-stone-600 dark:text-stone-400">{hint}</p>
+      ) : null}
+      {error ? (
+        <p id={errorId} className="text-sm text-red-700 dark:text-red-400">
+          {error}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+export function Badge({ children, tone = "neutral" }: { children: ReactNode; tone?: "neutral" | "accent" }) {
+  const look =
+    tone === "accent"
+      ? "bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200"
+      : "bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-300";
+  return (
+    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${look}`}>
+      {children}
+    </span>
+  );
+}
+
+export const selectClass = inputClass;
+
+export const secondaryButtonClass =
+  "inline-flex items-center justify-center rounded-md border border-stone-300 px-4 py-2 text-sm font-medium hover:bg-stone-100 disabled:opacity-60 dark:border-stone-600 dark:hover:bg-stone-800";
+
+export const primaryLinkClass =
+  "inline-flex items-center justify-center rounded-md bg-amber-800 px-4 py-2 text-sm font-medium text-white hover:bg-amber-900";

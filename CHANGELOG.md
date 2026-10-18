@@ -1,6 +1,26 @@
 # Changelog
 
-Every download is numbered 1.N.0; N goes up by 1 with each change.
+Downloads were numbered 1.N.0 through Phase 1 and are numbered 2.N.0 from
+Phase 2; N goes up by 1 with each change.
+
+## 2.1.0 (2026-10-18)
+- Log out now signs out only the current device instead of every device.
+  This also fixes the campaign browser test, which was being logged out by
+  the log-out test running at the same time with the same test account.
+
+## 2.0.0 (2026-10-18)
+- Phase 2 campaigns and membership: create, edit, archive, restore and
+  delete campaigns; Home lists your campaigns with your role.
+- Invite links with expiry and use limits, shown once, cancellable.
+  Invite page works for signed-out visitors and returns them after login.
+- Members page; owners change roles (Co-DM/Player), remove members and hand
+  over the campaign; Co-DMs can remove Players; members can leave.
+- Migration 0003: campaigns, members and invites with Row Level Security,
+  permission-checking functions, fellow members can see each other's names,
+  account deletion blocked while you own a campaign.
+- Tests: campaign permission suite (owner, co-DM, player, outsider),
+  invite edge cases, browser test of create, invite and join.
+- Third test account (Test C) used as the outsider.
 
 ## 1.5.0 (2026-10-18)
 - Browser tests: wait up to 15 seconds for page content and run at most
