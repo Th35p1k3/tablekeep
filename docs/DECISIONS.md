@@ -37,3 +37,18 @@ by 1 per change; `VERSION`, `package.json` and `CHANGELOG.md` must agree.
 New Next.js projects enable Cache Components. Pages are pre-built by default;
 anything live (database reads) goes inside `<Suspense>` and calls
 `connection()` or uses the data APIs that opt out of caching.
+
+## ADR-010 Invite-only sign-up enforced by the database
+A "Before User Created" auth hook checks `signup_allowlist`. Hiding the
+sign-up page would not be enough: anyone could call Supabase directly.
+
+## ADR-011 Account deletion without the secret key
+`delete_my_account()` runs with elevated rights but only ever deletes the
+caller. The service-role key never enters the app or Vercel.
+
+## ADR-012 Email links verified with token hashes
+Email templates link to `/auth/confirm?token_hash=...`, which works even
+when the link is opened on a different device from the one used to sign up.
+
+## ADR-013 Own small form components instead of shadcn/ui (for now)
+Five small components cover Phase 1. Revisit when screens get richer.
