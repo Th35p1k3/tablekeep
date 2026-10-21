@@ -27,11 +27,14 @@ export function SheetView({
   values,
   onChange,
   idPrefix = "sheet",
+  onRefill,
 }: {
   definition: TemplateDefinition;
   values: SheetInput;
   onChange: (key: string, value: unknown) => void;
   idPrefix?: string;
+  /** When given, resources get a "Refill" button that calls this. */
+  onRefill?: (key: string) => void;
 }) {
   const computed = useMemo(() => computeSheet(definition, values), [definition, values]);
 
@@ -152,6 +155,16 @@ export function SheetView({
               <span className="text-sm text-stone-600 dark:text-stone-400" data-testid={`max-${field.key}`}>
                 of {formatValue(max)}
               </span>
+              {onRefill && max !== undefined ? (
+                <button
+                  type="button"
+                  onClick={() => onRefill(field.key)}
+                  aria-label={`Refill ${field.label}`}
+                  className="rounded-md border border-stone-300 px-2.5 py-1.5 text-sm font-medium hover:bg-stone-100 dark:border-stone-600 dark:hover:bg-stone-800"
+                >
+                  Refill
+                </button>
+              ) : null}
             </div>
             {help}
             {problem}

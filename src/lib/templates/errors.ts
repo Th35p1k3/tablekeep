@@ -5,6 +5,7 @@ const MESSAGES: Array<[string, string]> = [
   ["only_draft", "This template has never been published, so there’s nothing to go back to. Delete it instead."],
   ["no_versions", "This template has no saved versions yet."],
   ["version_published", "Published versions can’t be changed."],
+  ["template_in_use", "Characters are still using this template. Delete or move those characters first, or keep the template."],
 ];
 
 export const GENERIC_TEMPLATE_ERROR = "Something went wrong. Please try again.";

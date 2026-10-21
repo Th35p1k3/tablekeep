@@ -1,7 +1,24 @@
 # Changelog
 
-Downloads were numbered 1.N.0 through Phase 1 and are numbered 2.N.0 from
-Phase 2; N goes up by 1 with each change.
+Downloads were numbered 1.N.0 through Phase 1 and 2.N.0 through Phase 3.
+From Phase 4 they are 3.N.P: N for each build step, P for small fixes.
+
+## 3.1.0 (2026-10-21)
+- Phase 4, step 4a: characters.
+  - My characters list and New character (from any published version of
+    your templates). Characters stay on that exact version.
+  - Character sheet with live calculations, saved automatically a moment
+    after you stop typing, with protection against two devices
+    overwriting each other.
+  - Refill buttons for each resource, plus "Refill all resources".
+  - Restore points: save, restore (the current sheet is saved first) and
+    delete. Rename, copy and delete characters.
+- Templates in use by a character can no longer be deleted.
+- Migration 0005: characters and restore points with owner-only access.
+- Tests: character data and refill tests; character security tests
+  (strangers, drafts, autosave conflicts, restore points); browser test of
+  creating and playing a character.
+- Version numbering moves to 3.N.P.
 
 ## 2.4.0 (2026-10-21)
 - Phase 3, step 3b: sheet template screens.

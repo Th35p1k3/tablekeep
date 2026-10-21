@@ -41,6 +41,7 @@ Record which ones you have run in the table below.
 | 0002_accounts.sql | | |
 | 0003_campaigns.sql | | |
 | 0004_templates.sql | | |
+| 0005_characters.sql | | |
 
 ## Environments
 

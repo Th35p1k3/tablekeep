@@ -31,8 +31,10 @@ switch to the Supabase CLI once there is more than one environment.
 
 ## ADR-008 Name and version numbers
 The app is called Tablekeep. Downloads were numbered 1.N.0 through Phase 1
-and are numbered 2.N.0 from Phase 2 (starting at 2.0.0), with N increasing by
-1 per change. `VERSION`, `package.json` and `CHANGELOG.md` must agree.
+and 2.N.0 through Phase 3. From Phase 4 they are numbered 3.N.P: N goes up
+by 1 for each build step (4a = 3.1.0, 4b = 3.2.0) and P by 1 for each small
+fix in between (3.1.1, 3.1.2 …), resetting at the next step. `VERSION`,
+`package.json` and `CHANGELOG.md` must agree.
 
 ## ADR-009 Cache Components stay on
 New Next.js projects enable Cache Components. Pages are pre-built by default;
@@ -101,3 +103,18 @@ deleting it and adding it there (may improve later).
 ## ADR-023 One sheet component for previews and characters
 `SheetView` renders any template with live calculations. The builder's
 preview uses it now; Phase 4 character sheets will use the same component.
+
+## ADR-024 Characters are pinned to a published template version
+A character points at one exact version. Template versions in use can't be
+deleted, and deleting a template that characters use is refused with a
+clear message. Upgrading characters to newer versions is a Version 2 feature.
+
+## ADR-025 Autosave refuses to overwrite newer changes
+Every save sends the timestamp of the version the browser last saw. If the
+character changed elsewhere in the meantime (another tab, another device),
+nothing is written and the sheet asks you to reload. After a failed save it
+waits for your next change rather than retrying in a loop.
+
+## ADR-026 Restore points
+Saved by hand any time, and automatically just before a restore (so a
+restore can itself be undone). The newest 50 per character are kept.
