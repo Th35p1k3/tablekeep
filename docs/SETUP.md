@@ -40,6 +40,7 @@ Record which ones you have run in the table below.
 | 0001_health_check.sql | | |
 | 0002_accounts.sql | | |
 | 0003_campaigns.sql | | |
+| 0004_templates.sql | | |
 
 ## Environments
 

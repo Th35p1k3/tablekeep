@@ -3,6 +3,18 @@
 Downloads were numbered 1.N.0 through Phase 1 and are numbered 2.N.0 from
 Phase 2; N goes up by 1 with each change.
 
+## 2.3.0 (2026-10-21)
+- Phase 3, step 3a: formula engine (`src/lib/formula`) with friendly error
+  messages, limits and protection against hostile formulas.
+- Template definitions (`src/lib/templates`): seven field types, full
+  validation (names, formulas, missing fields, circles), sheet calculation
+  that contains problems to the field that has them, and an original
+  starter sheet.
+- Migration 0004: templates with one draft and frozen numbered versions,
+  owner-only access, publish/new draft/discard/copy/delete actions.
+- Tests: 114 formula and template tests, plus template storage and
+  version security tests against the database. No new screens yet.
+
 ## 2.2.0 (2026-10-21)
 - Campaign browser test: after deleting, check only visible links on Home.
   Next.js keeps recently visited pages loaded but hidden for instant Back

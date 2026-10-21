@@ -70,3 +70,20 @@ the hash. The full link is shown once, right after it is created.
 ## ADR-017 One owner per campaign
 Enforced by a unique index. Owners must hand over or delete their campaigns
 before leaving them or deleting their account.
+
+## ADR-018 Custom formula engine (detail for ADR-006)
+`src/lib/formula` tokenizes, parses into a tree and evaluates. It knows only
+numbers, true/false, field names, + - * /, comparisons, and/or/not, and the
+functions floor, ceil, round, abs, min, max, clamp, if. Limits: 500
+characters, 200 pieces, 32 levels of nesting. Field values are looked up
+through Maps, never plain objects, so names like `constructor` reach nothing.
+
+## ADR-019 Templates: one editable draft, frozen published versions
+Each template has at most one draft. Publishing turns it into the next
+numbered version, which a database trigger then refuses to change.
+Characters (Phase 4) will point at a specific published version.
+
+## ADR-020 Template definitions are checked by the app, stored as JSON
+The database only checks that a definition is a JSON object under 256 KB.
+The app validates the full structure and every formula before saving, and
+re-checks when loading, so a bad definition can't break a sheet.
