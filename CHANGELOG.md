@@ -3,6 +3,20 @@
 Downloads were numbered 1.N.0 through Phase 1 and are numbered 2.N.0 from
 Phase 2; N goes up by 1 with each change.
 
+## 2.4.0 (2026-10-21)
+- Phase 3, step 3b: sheet template screens.
+  - My templates list with version and draft badges; link from Home.
+  - New template from the example sheet or blank.
+  - Builder: sections and fields, up/down reordering, every field type's
+    settings, short names that follow the label, formula hints, problems
+    shown per field and in a summary.
+  - Live preview beside the builder (below it on phones).
+  - Save draft, publish version N, discard draft, make changes to a
+    published template, copy, delete, edit name and description.
+- Reusable `SheetView` component for Phase 4 character sheets.
+- Tests: 26 builder helper tests; browser test that builds, tests,
+  publishes and deletes a template.
+
 ## 2.3.0 (2026-10-21)
 - Phase 3, step 3a: formula engine (`src/lib/formula`) with friendly error
   messages, limits and protection against hostile formulas.

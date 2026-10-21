@@ -87,3 +87,17 @@ Characters (Phase 4) will point at a specific published version.
 The database only checks that a definition is a JSON object under 256 KB.
 The app validates the full structure and every formula before saving, and
 re-checks when loading, so a bad definition can't break a sheet.
+
+## ADR-021 Builder saves drafts with unfinished formulas
+"Save draft" only requires a valid layout (names, labels, options), so work
+in progress isn't lost. "Publish" requires every check to pass, and the
+server re-checks both.
+
+## ADR-022 Reorder with buttons, not drag-and-drop
+Up/down buttons work the same with a mouse, a finger or a keyboard, and are
+far more reliable on phones. Moving a field to another section means
+deleting it and adding it there (may improve later).
+
+## ADR-023 One sheet component for previews and characters
+`SheetView` renders any template with live calculations. The builder's
+preview uses it now; Phase 4 character sheets will use the same component.

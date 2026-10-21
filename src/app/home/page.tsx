@@ -18,6 +18,9 @@ async function HomeContent() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-2xl font-semibold">Welcome, {name}</h1>
         <div className="flex items-center gap-3">
+          <Link href="/templates" className={linkClass}>
+            Sheet templates
+          </Link>
           <Link href="/account" className={linkClass}>
             Account
           </Link>
