@@ -191,3 +191,5 @@ export const secondaryButtonClass =
 
 export const primaryLinkClass =
   "inline-flex items-center justify-center rounded-md bg-amber-800 px-4 py-2 text-sm font-medium text-white hover:bg-amber-900";
+
+export const disabledLook = "disabled:cursor-not-allowed disabled:opacity-70";

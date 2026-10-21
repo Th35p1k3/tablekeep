@@ -14,6 +14,12 @@ const MESSAGES: Array<[code: string, message: string]> = [
     "You own at least one campaign. Hand it to someone else or delete it before deleting your account.",
   ],
   ["invalid_input", "Some of those values aren’t allowed."],
+  ["not_your_template", "You can only offer published versions of your own templates."],
+  ["character_in_campaign", "That character is already in a campaign. Remove it there first, or make a copy."],
+  [
+    "templates_in_use",
+    "Other players’ characters use your templates. Those characters must be deleted before your account can be.",
+  ],
 ];
 
 export const GENERIC_ERROR = "Something went wrong. Please try again.";

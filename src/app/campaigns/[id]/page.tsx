@@ -5,6 +5,9 @@ import { ActionButton } from "@/components/campaign-forms";
 import { Badge, Card, linkClass, secondaryButtonClass } from "@/components/ui";
 import { requireUser } from "@/lib/auth/session";
 import { leaveCampaign } from "@/lib/campaigns/actions";
+import { ChooseAndSubmitForm } from "@/components/party-forms";
+import { addCharacterToCampaign, removeCharacterFromCampaign } from "@/lib/party/actions";
+import { loadMyFreeCharacters, loadOfferedTemplates, loadParty } from "@/lib/party/queries";
 import { ROLE_LABEL, loadCampaign } from "@/lib/campaigns/queries";
 import { uuidSchema } from "@/lib/campaigns/validation";
 
@@ -19,6 +22,12 @@ async function CampaignContent({ params }: { params: Promise<{ id: string }> }) 
   const myRole = data.myRole;
   if (!myRole) notFound();
   const isManager = myRole === "owner" || myRole === "co_dm";
+  const [party, offered, freeCharacters] = await Promise.all([
+    loadParty(supabase, campaign.id),
+    loadOfferedTemplates(supabase, campaign.id),
+    loadMyFreeCharacters(supabase, user.id),
+  ]);
+  const active = campaign.status === "active";
 
   return (
     <>
@@ -72,11 +81,81 @@ async function CampaignContent({ params }: { params: Promise<{ id: string }> }) 
         </Card>
 
         <Card>
-          <h2 className="text-lg font-semibold">Coming soon</h2>
-          <p className="mt-2 leading-relaxed text-stone-600 dark:text-stone-400">
-            Characters, spells, chat, session logs and handouts arrive in later phases.
-          </p>
+          <h2 className="text-lg font-semibold">Characters ({party.length})</h2>
+          {party.length === 0 ? (
+            <p className="mt-2 text-sm text-stone-600 dark:text-stone-400">No characters in this campaign yet.</p>
+          ) : (
+            <ul className="mt-3 divide-y divide-stone-200 dark:divide-stone-700" data-testid="party-list">
+              {party.map((c) => (
+                <li key={c.character_id} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
+                  <span className="min-w-0 break-words">
+                    {c.can_view ? (
+                      <Link href={`/characters/${c.character_id}`} className={linkClass}>
+                        {c.character_name}
+                      </Link>
+                    ) : (
+                      <span className="font-medium">{c.character_name}</span>
+                    )}
+                    <span className="block text-xs text-stone-600 dark:text-stone-400">
+                      {c.owner_id === user.id ? "Your character" : `Played by ${c.owner_name}`} · {c.template_name}
+                      {c.version_number ? ` v${c.version_number}` : ""}
+                    </span>
+                  </span>
+                  {c.owner_id === user.id || isManager ? (
+                    <ActionButton
+                      action={removeCharacterFromCampaign}
+                      fields={{ campaignId: campaign.id, characterId: c.character_id }}
+                      label="Remove"
+                      confirmText={`Take ${c.character_name} out of this campaign?`}
+                    />
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {active ? (
+            <div className="mt-4 border-t border-stone-200 pt-4 dark:border-stone-700">
+              {freeCharacters.length ? (
+                <ChooseAndSubmitForm
+                  action={addCharacterToCampaign}
+                  fixed={{ campaignId: campaign.id }}
+                  name="characterId"
+                  label="Add one of your characters"
+                  options={freeCharacters.map((c) => ({ value: c.id, label: c.name }))}
+                  submitLabel="Add character"
+                />
+              ) : (
+                <p className="text-sm text-stone-600 dark:text-stone-400">
+                  All your characters are already in campaigns.{" "}
+                  <Link href="/characters/new" className={linkClass}>
+                    Create a new one
+                  </Link>
+                  .
+                </p>
+              )}
+            </div>
+          ) : null}
         </Card>
+
+        {offered.length ? (
+          <Card>
+            <h2 className="text-lg font-semibold">Sheets for this campaign</h2>
+            <p className="mt-1 text-sm text-stone-600 dark:text-stone-400">
+              Your DM offers these templates. Pick one when you create a character.
+            </p>
+            <ul className="mt-3 list-disc space-y-1 pl-5 text-sm">
+              {offered.map((t) => (
+                <li key={t.versionId}>{t.label}</li>
+              ))}
+            </ul>
+            <p className="mt-3 text-sm">
+              <Link href="/characters/new" className={linkClass}>
+                Create a character
+              </Link>
+            </p>
+          </Card>
+        ) : null}
 
         {myRole !== "owner" ? (
           <ActionButton

@@ -3,6 +3,22 @@
 Downloads were numbered 1.N.0 through Phase 1 and 2.N.0 through Phase 3.
 From Phase 4 they are 3.N.P: N for each build step, P for small fixes.
 
+## 3.2.0 (2026-10-21)
+- Phase 4, step 4b: characters in campaigns.
+  - Inventory on every character: add, edit, remove, quantity buttons,
+    total weight.
+  - DMs offer their published templates in campaign settings; players see
+    them on the campaign page and when creating a character.
+  - Add a character to a campaign (from the character or the campaign);
+    one campaign per character; owners and DMs can remove.
+  - Party list on the campaign page. DMs open characters read-only;
+    players see names unless the DM allows full sheets.
+- Leaving or being removed from a campaign takes your characters out of
+  its party. Account deletion is refused while others use your templates.
+- Migration 0006: inventory, offered templates, party, visibility rules.
+- Tests: inventory rules; party and visibility security tests; browser
+  test with a DM and a player.
+
 ## 3.1.0 (2026-10-21)
 - Phase 4, step 4a: characters.
   - My characters list and New character (from any published version of

@@ -28,6 +28,7 @@ export function SheetView({
   onChange,
   idPrefix = "sheet",
   onRefill,
+  readOnly = false,
 }: {
   definition: TemplateDefinition;
   values: SheetInput;
@@ -35,6 +36,8 @@ export function SheetView({
   idPrefix?: string;
   /** When given, resources get a "Refill" button that calls this. */
   onRefill?: (key: string) => void;
+  /** Show values without letting anyone change them. */
+  readOnly?: boolean;
 }) {
   const computed = useMemo(() => computeSheet(definition, values), [definition, values]);
 
@@ -66,6 +69,7 @@ export function SheetView({
               max={field.max}
               value={asText(read(values, field.key), field.default)}
               onChange={(e) => onChange(field.key, e.target.value)}
+              disabled={readOnly}
               className={inputClass}
             />
             {help}
@@ -80,6 +84,7 @@ export function SheetView({
               type="text"
               value={asText(read(values, field.key), field.default)}
               onChange={(e) => onChange(field.key, e.target.value)}
+              disabled={readOnly}
               className={inputClass}
             />
             {help}
@@ -94,6 +99,7 @@ export function SheetView({
               rows={3}
               value={asText(read(values, field.key), field.default)}
               onChange={(e) => onChange(field.key, e.target.value)}
+              disabled={readOnly}
               className={inputClass}
             />
             {help}
@@ -110,6 +116,7 @@ export function SheetView({
                 type="checkbox"
                 checked={checked}
                 onChange={(e) => onChange(field.key, e.target.checked)}
+                disabled={readOnly}
                 className="h-5 w-5 accent-amber-800"
               />
               {field.label}
@@ -126,6 +133,7 @@ export function SheetView({
               id={id}
               value={asText(read(values, field.key), field.default)}
               onChange={(e) => onChange(field.key, e.target.value)}
+              disabled={readOnly}
               className={inputClass}
             >
               <option value="">—</option>
@@ -150,12 +158,13 @@ export function SheetView({
                 inputMode="decimal"
                 value={asText(read(values, field.key), max)}
                 onChange={(e) => onChange(field.key, e.target.value)}
+                disabled={readOnly}
                 className={`${inputClass} w-28`}
               />
               <span className="text-sm text-stone-600 dark:text-stone-400" data-testid={`max-${field.key}`}>
                 of {formatValue(max)}
               </span>
-              {onRefill && max !== undefined ? (
+              {onRefill && !readOnly && max !== undefined ? (
                 <button
                   type="button"
                   onClick={() => onRefill(field.key)}
@@ -220,4 +229,9 @@ export function SheetPreview({ definition, idPrefix }: { definition: TemplateDef
       onChange={(key, value) => setValues((v) => ({ ...v, [key]: value }))}
     />
   );
+}
+
+/** A finished sheet shown to someone who may look but not edit (a DM, say). */
+export function ReadOnlySheet({ definition, values }: { definition: TemplateDefinition; values: SheetInput }) {
+  return <SheetView definition={definition} values={values} idPrefix="view" readOnly onChange={() => {}} />;
 }

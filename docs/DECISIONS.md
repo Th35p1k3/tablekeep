@@ -118,3 +118,20 @@ waits for your next change rather than retrying in a loop.
 ## ADR-026 Restore points
 Saved by hand any time, and automatically just before a restore (so a
 restore can itself be undone). The newest 50 per character are kept.
+
+## ADR-027 Campaigns offer templates
+A DM offers published versions of their own templates to a campaign;
+members can build characters from them. Withdrawing an offer doesn't break
+existing characters: anyone who can see a character can read its template.
+
+## ADR-028 Who sees a character
+Owner always; the campaign's DM and Co-DMs always (read-only); other players
+only when the campaign's "players see full sheets" setting is on. Everyone
+in the campaign sees the party list (names, players, templates) through a
+database function that returns nothing else.
+
+## ADR-029 Leaving takes your characters with you
+Removing or leaving a campaign also removes that person's characters from
+its party (a database trigger). Characters themselves are never deleted.
+Accounts can't be deleted while other players' characters use their
+templates.

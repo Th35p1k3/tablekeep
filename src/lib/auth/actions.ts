@@ -206,7 +206,7 @@ export async function deleteAccount(
   const supabase = await createClient();
   const { error } = await supabase.rpc("delete_my_account");
   if (error) {
-    if (error.message.includes("owns_campaigns")) {
+    if (error.message.includes("owns_campaigns") || error.message.includes("templates_in_use")) {
       return { status: "error", message: friendlyCampaignError(error) };
     }
     console.error(`[account] delete failed: ${error.message}`);

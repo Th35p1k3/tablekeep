@@ -14,6 +14,9 @@ import { requireUser } from "@/lib/auth/session";
 import { removeMember, revokeInvite, setCampaignArchived } from "@/lib/campaigns/actions";
 import { ROLE_LABEL, inviteStatus, loadCampaign, loadInvites } from "@/lib/campaigns/queries";
 import { uuidSchema } from "@/lib/campaigns/validation";
+import { ChooseAndSubmitForm } from "@/components/party-forms";
+import { offerTemplate, setPlayersSeeFullSheets, withdrawTemplate } from "@/lib/party/actions";
+import { loadMyLatestVersions, loadOfferedTemplates } from "@/lib/party/queries";
 
 function shortDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-US", {
@@ -36,7 +39,17 @@ async function SettingsContent({ params }: { params: Promise<{ id: string }> }) 
   if (myRole === "player") redirect(`/campaigns/${campaign.id}`);
 
   const isOwner = myRole === "owner";
-  const invites = await loadInvites(supabase, campaign.id);
+  const [invites, offered, mine, visibility] = await Promise.all([
+    loadInvites(supabase, campaign.id),
+    loadOfferedTemplates(supabase, campaign.id),
+    loadMyLatestVersions(supabase, user.id),
+    supabase.from("campaigns").select("players_see_full_sheets").eq("id", campaign.id).maybeSingle(),
+  ]);
+  const playersSeeSheets = Boolean(
+    (visibility.data as { players_see_full_sheets?: boolean } | null)?.players_see_full_sheets,
+  );
+  const offeredIds = new Set(offered.map((o) => o.versionId));
+  const canOffer = mine.filter((m) => !offeredIds.has(m.versionId));
   const now = new Date();
   const archived = campaign.status === "archived";
 
@@ -89,6 +102,58 @@ async function SettingsContent({ params }: { params: Promise<{ id: string }> }) 
             </ul>
           </div>
         ) : null}
+      </Card>
+
+      <Card>
+        <h2 className="text-lg font-semibold">Character sheets</h2>
+        <p className="mt-1 mb-4 text-sm leading-relaxed text-stone-600 dark:text-stone-400">
+          Offer your published templates so players can build characters from
+          them. Withdrawing one doesn’t affect characters already made.
+        </p>
+        {offered.length ? (
+          <ul className="mb-4 divide-y divide-stone-200 dark:divide-stone-700" data-testid="offered-templates">
+            {offered.map((t) => (
+              <li key={t.versionId} className="flex flex-wrap items-center justify-between gap-2 py-2.5 text-sm">
+                <span>{t.label}</span>
+                <ActionButton
+                  action={withdrawTemplate}
+                  fields={{ campaignId: campaign.id, versionId: t.versionId }}
+                  label="Withdraw"
+                />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mb-4 text-sm">No templates offered yet.</p>
+        )}
+        {canOffer.length ? (
+          <ChooseAndSubmitForm
+            action={offerTemplate}
+            fixed={{ campaignId: campaign.id }}
+            name="versionId"
+            label="Offer a template"
+            options={canOffer.map((m) => ({ value: m.versionId, label: m.label }))}
+            submitLabel="Offer template"
+          />
+        ) : (
+          <p className="text-sm text-stone-600 dark:text-stone-400">
+            {mine.length ? "All your published templates are offered." : "Publish a sheet template to offer it here."}
+          </p>
+        )}
+
+        <div className="mt-6 border-t border-stone-200 pt-4 dark:border-stone-700">
+          <h3 className="text-sm font-semibold">Who can open character sheets</h3>
+          <p className="mt-1 mb-3 text-sm text-stone-600 dark:text-stone-400">
+            {playersSeeSheets
+              ? "Players can open each other’s full sheets."
+              : "Players see each other’s character names only. DMs always see full sheets."}
+          </p>
+          <ActionButton
+            action={setPlayersSeeFullSheets}
+            fields={{ campaignId: campaign.id, allow: playersSeeSheets ? "false" : "true" }}
+            label={playersSeeSheets ? "Show names only" : "Let players see full sheets"}
+          />
+        </div>
       </Card>
 
       <Card>
