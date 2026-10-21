@@ -45,7 +45,10 @@ test("a DM creates a campaign, invites a player, and the player joins", async ({
   await page.getByLabel(`Type “${name}” to confirm`).fill(name);
   await page.getByRole("button", { name: "Delete campaign" }).click();
   await expect(page).toHaveURL(/\/home$/);
-  await expect(page.getByText(name)).toHaveCount(0);
+  // Next.js keeps recently visited pages loaded but hidden, so only check
+  // what is visible: the campaign must be gone from the Home list.
+  await expect(page.getByRole("heading", { name: "Your campaigns" })).toBeVisible();
+  await expect(page.getByRole("link", { name })).toHaveCount(0);
 });
 
 test("signed-out visitors can't open a campaign page", async ({ page }) => {

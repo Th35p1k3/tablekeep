@@ -3,6 +3,11 @@
 Downloads were numbered 1.N.0 through Phase 1 and are numbered 2.N.0 from
 Phase 2; N goes up by 1 with each change.
 
+## 2.2.0 (2026-10-21)
+- Campaign browser test: after deleting, check only visible links on Home.
+  Next.js keeps recently visited pages loaded but hidden for instant Back
+  navigation, and the old check counted that hidden text.
+
 ## 2.1.0 (2026-10-18)
 - Log out now signs out only the current device instead of every device.
   This also fixes the campaign browser test, which was being logged out by
