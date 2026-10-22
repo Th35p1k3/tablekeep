@@ -4,7 +4,9 @@ import { notFound } from "next/navigation";
 import { ActionButton } from "@/components/campaign-forms";
 import { RenameCharacterForm } from "@/components/character-forms";
 import { CharacterSheet } from "@/components/character-sheet";
+import { CharacterSpellsPanel } from "@/components/character-spells";
 import { InventoryPanel } from "@/components/inventory-panel";
+import { loadCharacterSpells, loadMyLatestSpellVersions } from "@/lib/spells/queries";
 import { ChooseAndSubmitForm } from "@/components/party-forms";
 import { ReadOnlySheet } from "@/components/sheet-view";
 import { Badge, Card, linkClass } from "@/components/ui";
@@ -26,9 +28,10 @@ async function CharacterContent({ params }: { params: Promise<{ id: string }> })
 
   const isOwner = character.owner_id === user.id;
   const definition = coerceDefinition(character.definition);
-  const [items, campaign] = await Promise.all([
+  const [items, campaign, spells] = await Promise.all([
     loadInventory(supabase, character.id),
     loadCharacterCampaign(supabase, character.id),
+    loadCharacterSpells(supabase, character.id),
   ]);
   const fields = { characterId: character.id };
 
@@ -62,15 +65,19 @@ async function CharacterContent({ params }: { params: Promise<{ id: string }> })
           <Card>
             <ReadOnlySheet definition={definition} values={character.data} />
           </Card>
-          <InventoryPanel characterId={character.id} initialItems={items} readOnly />
+          <div className="space-y-6">
+            <CharacterSpellsPanel characterId={character.id} initialSpells={spells} available={[]} readOnly />
+            <InventoryPanel characterId={character.id} initialItems={items} readOnly />
+          </div>
         </div>
       </div>
     );
   }
 
-  const [points, campaigns] = await Promise.all([
+  const [points, campaigns, spellOptions] = await Promise.all([
     loadRestorePoints(supabase, character.id),
     campaign ? Promise.resolve([] as Array<{ id: string; name: string }>) : loadMyActiveCampaigns(supabase, user.id),
+    loadMyLatestSpellVersions(supabase, user.id),
   ]);
 
   return (
@@ -139,7 +146,10 @@ async function CharacterContent({ params }: { params: Promise<{ id: string }> })
         initialUpdatedAt={character.updated_at}
         initialPoints={points}
       />
-      <InventoryPanel characterId={character.id} initialItems={items} />
+      <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
+        <CharacterSpellsPanel characterId={character.id} initialSpells={spells} available={spellOptions} />
+        <InventoryPanel characterId={character.id} initialItems={items} />
+      </div>
     </div>
   );
 }

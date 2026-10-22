@@ -43,6 +43,7 @@ Record which ones you have run in the table below.
 | 0004_templates.sql | | |
 | 0005_characters.sql | | |
 | 0006_party.sql | | |
+| 0007_spells.sql | | |
 
 ## Environments
 

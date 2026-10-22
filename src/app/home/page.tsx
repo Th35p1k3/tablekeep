@@ -21,6 +21,9 @@ async function HomeContent() {
           <Link href="/characters" className={linkClass}>
             My characters
           </Link>
+          <Link href="/spells" className={linkClass}>
+            My spells
+          </Link>
           <Link href="/templates" className={linkClass}>
             Sheet templates
           </Link>

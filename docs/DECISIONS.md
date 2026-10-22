@@ -33,7 +33,8 @@ switch to the Supabase CLI once there is more than one environment.
 The app is called Tablekeep. Downloads were numbered 1.N.0 through Phase 1
 and 2.N.0 through Phase 3. From Phase 4 they are numbered 3.N.P: N goes up
 by 1 for each build step (4a = 3.1.0, 4b = 3.2.0) and P by 1 for each small
-fix in between (3.1.1, 3.1.2 …), resetting at the next step. `VERSION`,
+fix in between (3.1.1, 3.1.2 …), resetting at the next step. From Phase 5
+they are 4.N.P in the same way (5a = 4.1.0, 5b = 4.2.0). `VERSION`,
 `package.json` and `CHANGELOG.md` must agree.
 
 ## ADR-009 Cache Components stay on
@@ -135,3 +136,24 @@ Removing or leaving a campaign also removes that person's characters from
 its party (a database trigger). Characters themselves are never deleted.
 Accounts can't be deleted while other players' characters use their
 templates.
+
+## ADR-030 Spells work like templates
+One editable draft, frozen numbered versions. Characters (and, in 5b,
+campaign approvals) point at an exact version. Spells in use can't be
+deleted.
+
+## ADR-031 Edition-agnostic spell content
+Only a name and description are required. Common properties (level,
+category, casting time, range, area, duration, components, concentration,
+ritual, tags) are optional, plus up to 20 custom label/value properties.
+Effects are typed blocks: damage, healing, saving throw, attack roll,
+condition, area, custom text.
+
+## ADR-032 Dice text is checked, not rolled (yet)
+`checkDice` accepts dice (NdM), whole numbers and modifier names joined with
++ or -, and reports range and average when it can. The dice roller is a
+Version 2 feature and will reuse it.
+
+## ADR-033 Effect presets are copied, not linked
+Inserting a preset copies the block into the spell. Editing or deleting a
+preset never changes existing spells.

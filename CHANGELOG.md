@@ -1,7 +1,31 @@
 # Changelog
 
 Downloads were numbered 1.N.0 through Phase 1 and 2.N.0 through Phase 3.
-From Phase 4 they are 3.N.P: N for each build step, P for small fixes.
+From Phase 4 they are 3.N.P, and from Phase 5 4.N.P: N for each build step,
+P for small fixes.
+
+## 4.1.1 (2026-10-21)
+- The "Prepared" checkbox on a character's spells now ticks instantly and
+  saves in the background, undoing itself with a message if saving fails.
+  Previously it only changed after the server replied, which felt
+  unresponsive and failed the spell browser test.
+
+## 4.1.0 (2026-10-21)
+- Phase 5, step 5a: custom spells.
+  - My spells list; new spell; builder with basics, custom properties and
+    effect blocks (damage, healing, saving throw, attack roll, condition,
+    area, custom text), each with an optional "at higher levels" note.
+  - Dice checked as you type, with range and average.
+  - Effect presets: save any block, insert it into other spells.
+  - Live spell card preview; drafts, publish version N, make changes,
+    discard, copy, rename, delete.
+  - Spells card on characters: add published spells, mark prepared, open
+    the spell card, remove. DMs see a character's spells read-only.
+- Migration 0007: spells, versions, presets, character spells, with
+  owner-only access and viewers of a character able to read its spells.
+- Tests: dice and spell rule tests; spell security tests; browser test
+  that builds a spell and prepares it on a character.
+- Version numbering moves to 4.N.P.
 
 ## 3.2.0 (2026-10-21)
 - Phase 4, step 4b: characters in campaigns.
