@@ -47,6 +47,7 @@ Record which ones you have run in the table below.
 | 0008_homebrew.sql | | |
 | 0009_campaign_tools.sql | | |
 | 0010_chat_handouts.sql | | |
+| 0011_rolls.sql | | |
 
 ## Environments
 

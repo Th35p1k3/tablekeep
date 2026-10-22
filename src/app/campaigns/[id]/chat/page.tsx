@@ -3,18 +3,35 @@ import { CampaignHeader } from "@/components/campaign-tabs";
 import { ChatPanel } from "@/components/chat-panel";
 import { loadCampaignPage } from "@/lib/campaigns/page-data";
 import { loadMessages } from "@/lib/chat/queries";
+import { RollsPanel } from "@/components/rolls-panel";
+import { loadMyCampaignCharacters, loadRollRequests } from "@/lib/rolls/queries";
 
 async function Chat({ params }: { params: Promise<{ id: string }> }) {
-  const { supabase, user, campaign, members, myRole } = await loadCampaignPage(params);
-  const { messages, hasMore } = await loadMessages(supabase, campaign.id);
+  const { supabase, user, campaign, members, myRole, isManager } = await loadCampaignPage(params);
+  const [{ messages, hasMore }, requests, myCharacters] = await Promise.all([
+    loadMessages(supabase, campaign.id),
+    loadRollRequests(supabase, campaign.id),
+    loadMyCampaignCharacters(supabase, campaign.id, user.id),
+  ]);
+  const chatMembers = members.map((m) => ({ user_id: m.user_id, display_name: m.display_name, role: m.role }));
   return (
     <>
       <CampaignHeader supabase={supabase} campaign={campaign} myRole={myRole} active="chat" />
+      <div className="mb-4">
+        <RollsPanel
+          campaignId={campaign.id}
+          me={user.id}
+          isManager={isManager}
+          members={chatMembers}
+          initialRequests={requests}
+          myCharacters={myCharacters}
+        />
+      </div>
       <ChatPanel
         campaignId={campaign.id}
         me={user.id}
         myRole={myRole}
-        members={members.map((m) => ({ user_id: m.user_id, display_name: m.display_name, role: m.role }))}
+        members={chatMembers}
         initialMessages={messages}
         initialHasMore={hasMore}
       />

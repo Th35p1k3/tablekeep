@@ -4,7 +4,7 @@ A web app where Dungeon Masters and players run campaigns, build custom
 character sheets and spells, and share campaign tools. Edition-agnostic and
 homebrew-first: it ships with no proprietary game content.
 
-**Version:** 5.2.2 · **Status:** Phase 6 (campaign communication), step 6b. See the project plan doc for the roadmap.
+**Version:** 5.3.0 · **Status:** Phase 6 (campaign communication) complete pending checks. See the project plan doc for the roadmap.
 
 ## Quick start
 

@@ -4,6 +4,21 @@ Downloads were numbered 1.N.0 through Phase 1 and 2.N.0 through Phase 3.
 From Phase 4 they are 3.N.P, from Phase 5 4.N.P and from Phase 6 5.N.P:
 N for each build step, P for small fixes.
 
+## 5.3.0 (2026-10-21)
+- Phase 6, step 6c: dice rolls.
+  - DMs request a roll from the Chat tab: check name, dice (like 1d20),
+    an optional modifier from each player's sheet (like wisdom_mod), an
+    extra bonus, roll once or twice keeping the higher/lower, and who rolls.
+  - Players see the request instantly and tap Roll (rolled fairly by the
+    database, modifier read from their character) or type in a real-dice
+    result.
+  - DMs watch results arrive live with a full breakdown; results stay
+    private unless "Show results in chat" is ticked. Requests can be closed.
+- Migration 0011: roll requests, targets and results with live updates,
+  secure database dice.
+- Tests: roll rule tests; security tests for who can request, see and roll,
+  fairness and totals; browser test of a live roll request.
+
 ## 5.2.2 (2026-10-21)
 - Chat no longer misses a message sent in the moment someone opens chat.
   It now catches up when the live connection opens, when you return to

@@ -209,3 +209,16 @@ Files go directly to a private storage bucket at
 Storage rules let only DMs and Co-DMs upload and delete, and let people
 view a file only if they can see its handout. Links to files are signed and
 expire after 10 minutes. Images (JPG, PNG, WebP) and PDFs up to 10 MB.
+
+## ADR-043 Dice are rolled by the database
+Roll requests are rolled inside the database with secure random bytes, and
+saved immediately, once per player per request. Nobody can fake, predict or
+re-roll a die. The sheet modifier is read by the app from the player's own
+character and recorded separately next to the dice, so the DM can compare
+it with the sheet. (Without the database's master key the app can't prove
+the modifier; a player could in principle send a false one.)
+
+## ADR-044 Roll results are private unless shared
+Results are seen by the DM and the roller. "Show results in chat" posts
+each result as a chat message from the roller. Players can also type in a
+result rolled with real dice; it's marked as such.
