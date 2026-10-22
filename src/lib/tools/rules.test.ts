@@ -47,6 +47,8 @@ describe("describeActivity", () => {
     [{ action: "submission_reviewed", details: { type: "spell", decision: "changes_requested", user_id: "u1" } }, "Will asked for changes to a spell from Bram."],
     [{ action: "log_deleted", details: { title: "Session 3" } }, "Will deleted the session log “Session 3”."],
     [{ action: "member_left", details: { user_id: "gone" } }, "a former member left the campaign."],
+    [{ action: "message_deleted", details: { user_id: "u1" } }, "Will deleted a chat message from Bram."],
+    [{ action: "handout_created", details: { title: "Map" } }, "Will shared the handout “Map”."],
     [{ action: "something_new", details: {} }, "Will did something (something_new)."],
   ])("%j", (entry, sentence) => {
     expect(describeActivity({ ...entry, actorName: "Will" }, names)).toBe(sentence);

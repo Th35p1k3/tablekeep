@@ -46,6 +46,7 @@ Record which ones you have run in the table below.
 | 0007_spells.sql | | |
 | 0008_homebrew.sql | | |
 | 0009_campaign_tools.sql | | |
+| 0010_chat_handouts.sql | | |
 
 ## Environments
 
@@ -112,3 +113,13 @@ they finish. If a test run is interrupted, a leftover `[test]` campaign may
 remain: log in as Test A and delete it from its Settings page. If Test C is
 left inside a campaign, the "stranger" security test will fail until it is
 removed.
+
+## Live chat and file storage (Phase 6b)
+
+Migration 0010 turns on live updates for chat and creates a private storage
+bucket called `handouts`. Nothing else to click. To check: Supabase →
+Storage should list `handouts` (Private), and Database → Publications →
+`supabase_realtime` should include `messages`.
+
+Free-tier limits worth knowing: 1 GB of file storage and a generous number
+of live connections, far more than a friends group needs.

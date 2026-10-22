@@ -92,6 +92,12 @@ export function describeActivity(entry: Activity, nameOf: (userId: string) => st
       return `${who} withdrew a sheet template.`;
     case "log_deleted":
       return `${who} deleted the session log “${text("title")}”.`;
+    case "message_deleted":
+      return `${who} deleted a chat message from ${user}.`;
+    case "handout_created":
+      return `${who} shared the handout “${text("title")}”.`;
+    case "handout_deleted":
+      return `${who} deleted the handout “${text("title")}”.`;
     case "announcement_deleted":
       return `${who} deleted the announcement “${text("title")}”.`;
     default:

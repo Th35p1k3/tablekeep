@@ -6,7 +6,17 @@ import { Badge } from "./ui";
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
-export type CampaignTab = "overview" | "party" | "spells" | "logs" | "notes" | "approvals" | "activity" | "settings";
+export type CampaignTab =
+  | "overview"
+  | "chat"
+  | "party"
+  | "spells"
+  | "logs"
+  | "handouts"
+  | "notes"
+  | "approvals"
+  | "activity"
+  | "settings";
 
 /** Campaign name, your role, and the tab strip shown on every campaign page. */
 export async function CampaignHeader({
@@ -33,9 +43,11 @@ export async function CampaignHeader({
 
   const tabs: Array<{ key: CampaignTab; label: string; href: string; show: boolean }> = [
     { key: "overview", label: "Overview", href: "", show: true },
+    { key: "chat", label: "Chat", href: "/chat", show: true },
     { key: "party", label: "Party", href: "/party", show: true },
     { key: "spells", label: "Spells", href: "/spells", show: true },
     { key: "logs", label: "Logs", href: "/logs", show: true },
+    { key: "handouts", label: "Handouts", href: "/handouts", show: true },
     { key: "notes", label: "DM notes", href: "/notes", show: isManager },
     { key: "approvals", label: pending ? `Approvals (${pending})` : "Approvals", href: "/approvals", show: isManager },
     { key: "activity", label: "Activity", href: "/activity", show: isManager },

@@ -194,3 +194,18 @@ Entries are skipped while a campaign is being deleted.
 ## ADR-040 Whispers go DM ↔ players only (Phase 6b)
 Chosen as the default: DMs can whisper to any players; players can whisper
 back to DMs but not to each other.
+
+## ADR-041 Live chat through Supabase Realtime
+The browser subscribes to new, edited and deleted messages for one
+campaign. The database's read rules apply to live updates too, so whispers
+never reach anyone else's browser. More than 10 messages in 10 seconds from
+one person is refused. Because live connections can miss a message sent
+while they open, chat also catches up on connect, on returning to the tab,
+and every 8 seconds while visible.
+
+## ADR-042 Handout files upload straight from the browser
+Files go directly to a private storage bucket at
+<campaign>/<handout>/<file>, avoiding the server's upload size limits.
+Storage rules let only DMs and Co-DMs upload and delete, and let people
+view a file only if they can see its handout. Links to files are signed and
+expire after 10 minutes. Images (JPG, PNG, WebP) and PDFs up to 10 MB.

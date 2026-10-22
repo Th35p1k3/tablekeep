@@ -4,6 +4,33 @@ Downloads were numbered 1.N.0 through Phase 1 and 2.N.0 through Phase 3.
 From Phase 4 they are 3.N.P, from Phase 5 4.N.P and from Phase 6 5.N.P:
 N for each build step, P for small fixes.
 
+## 5.2.2 (2026-10-21)
+- Chat no longer misses a message sent in the moment someone opens chat.
+  It now catches up when the live connection opens, when you return to
+  the tab, and with a light check every 8 seconds while the tab is
+  visible. Found by the desktop chat browser test.
+
+## 5.2.1 (2026-10-21)
+- Fixed two TypeScript errors in the chat panel: the browser database
+  connection and live-update callbacks now state their types explicitly.
+  No change in behaviour.
+
+## 5.2.0 (2026-10-21)
+- Phase 6, step 6b: chat and handouts.
+  - Chat tab: live campaign chat (no refreshing), load older messages,
+    edit and delete your own messages, DMs can delete any (recorded in the
+    activity log), spam guard.
+  - Whispers: DMs whisper to any players; players whisper to DMs. Clearly
+    marked, and only recipients and DMs ever receive them.
+  - Handouts tab: title, text and an optional image or PDF (up to 10 MB),
+    shown to everyone, chosen players, or DMs only. Edit text and who can
+    see it; delete removes the file too.
+- Migration 0010: messages, handouts, recipients, private file storage
+  with matching access rules, live updates for chat.
+- Tests: whisper and file rule tests; security tests for chat, whispers,
+  handouts and direct file access; browser test of live chat, whispers and
+  a private handout with an image.
+
 ## 5.1.0 (2026-10-21)
 - Phase 6, step 6a: campaign tools.
   - Campaign pages split into tabs: Overview, Party, Spells, Logs, and for
