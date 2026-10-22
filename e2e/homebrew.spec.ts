@@ -39,7 +39,7 @@ test("a player submits a spell and the DM approves it for the campaign", async (
     await expect(player.getByRole("button", { name: "Make changes" })).toBeVisible();
     spellUrl = player.url();
 
-    await player.goto(campaignUrl.replace(/^https?:\/\/[^/]+/, ""));
+    await player.goto(`${campaignUrl.replace(/^https?:\/\/[^/]+/, "")}/spells`);
     await player.getByLabel("Spell or sheet template").selectOption({ label: `Spell: ${spellName} (version 1)` });
     await player.getByLabel("Note for your DM (optional)").fill("Like a cold firebolt.");
     await player.getByRole("button", { name: "Submit for approval" }).click();

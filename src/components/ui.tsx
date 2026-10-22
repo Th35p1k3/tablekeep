@@ -12,6 +12,7 @@ export function Field({
   defaultValue,
   error,
   hint,
+  id: explicitId,
 }: {
   label: string;
   name: string;
@@ -20,8 +21,10 @@ export function Field({
   defaultValue?: string;
   error?: string;
   hint?: string;
+  /** Needed when the same form appears more than once on a page. */
+  id?: string;
 }) {
-  const id = `field-${name}`;
+  const id = explicitId ?? `field-${name}`;
   const errorId = `${id}-error`;
   return (
     <div className="space-y-1.5">
@@ -136,6 +139,7 @@ export function TextAreaField({
   error,
   hint,
   rows = 4,
+  id: explicitId,
 }: {
   label: string;
   name: string;
@@ -143,8 +147,9 @@ export function TextAreaField({
   error?: string;
   hint?: string;
   rows?: number;
+  id?: string;
 }) {
-  const id = `field-${name}`;
+  const id = explicitId ?? `field-${name}`;
   const errorId = `${id}-error`;
   return (
     <div className="space-y-1.5">

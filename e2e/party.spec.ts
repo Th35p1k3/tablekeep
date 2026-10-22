@@ -64,7 +64,7 @@ test("a DM offers a sheet, a player builds a character for the campaign, and the
     await expect(player.getByTestId("inventory-list")).toContainText("Rope");
 
     // DM: the character shows in the party and opens read-only.
-    await page.goto(campaignUrl);
+    await page.goto(`${campaignUrl}/party`);
     await expect(page.getByTestId("party-list")).toContainText(characterName);
     await page.getByRole("link", { name: characterName }).click();
     await expect(page.getByText("View only")).toBeVisible();

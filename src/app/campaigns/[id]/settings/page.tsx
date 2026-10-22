@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import {
   ActionButton,
@@ -9,11 +8,14 @@ import {
   RoleSelectForm,
   TransferOwnershipForm,
 } from "@/components/campaign-forms";
-import { Badge, Card, linkClass } from "@/components/ui";
+import { Badge, Card } from "@/components/ui";
 import { requireUser } from "@/lib/auth/session";
 import { removeMember, revokeInvite, setCampaignArchived } from "@/lib/campaigns/actions";
 import { ROLE_LABEL, inviteStatus, loadCampaign, loadInvites } from "@/lib/campaigns/queries";
 import { uuidSchema } from "@/lib/campaigns/validation";
+import { CampaignHeader } from "@/components/campaign-tabs";
+import { setPlayersWriteLogs } from "@/lib/tools/actions";
+import { loadCampaignSettings } from "@/lib/tools/queries";
 import { ChooseAndSubmitForm } from "@/components/party-forms";
 import { offerTemplate, setPlayersSeeFullSheets, withdrawTemplate } from "@/lib/party/actions";
 import { loadMyLatestVersions, loadOfferedTemplates } from "@/lib/party/queries";
@@ -59,6 +61,7 @@ async function SettingsContent({ params }: { params: Promise<{ id: string }> }) 
   const spellsNeedApproval = settings?.spells_need_approval !== false;
   const inCampaign = new Set(campaignSpells.map((sp) => sp.versionId));
   const spellsToAdd = mySpells.filter((sp) => !inCampaign.has(sp.versionId));
+  const { playersWriteLogs } = await loadCampaignSettings(supabase, campaign.id);
   const offeredIds = new Set(offered.map((o) => o.versionId));
   const canOffer = mine.filter((m) => !offeredIds.has(m.versionId));
   const now = new Date();
@@ -66,7 +69,7 @@ async function SettingsContent({ params }: { params: Promise<{ id: string }> }) 
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold break-words">{campaign.name}: settings</h1>
+      <CampaignHeader supabase={supabase} campaign={campaign} myRole={myRole} active="settings" />
 
       <Card>
         <h2 className="mb-4 text-lg font-semibold">Details</h2>
@@ -218,6 +221,20 @@ async function SettingsContent({ params }: { params: Promise<{ id: string }> }) 
       </Card>
 
       <Card>
+        <h2 className="text-lg font-semibold">Session logs</h2>
+        <p className="mt-1 mb-3 text-sm text-stone-600 dark:text-stone-400">
+          {playersWriteLogs
+            ? "Players can add their own recaps (always visible to everyone)."
+            : "Only DMs and Co-DMs can write session logs."}
+        </p>
+        <ActionButton
+          action={setPlayersWriteLogs}
+          fields={{ campaignId: campaign.id, allow: playersWriteLogs ? "false" : "true" }}
+          label={playersWriteLogs ? "Only DMs write logs" : "Let players write logs"}
+        />
+      </Card>
+
+      <Card>
         <h2 className="text-lg font-semibold">Members</h2>
         <ul className="mt-4 divide-y divide-stone-200 dark:divide-stone-700">
           {members.map((m) => {
@@ -302,22 +319,8 @@ export default function CampaignSettingsPage({ params }: { params: Promise<{ id:
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-10 sm:py-14">
       <Suspense fallback={<p>Loading…</p>}>
-        <BackLink params={params} />
-      </Suspense>
-      <Suspense fallback={<p>Loading…</p>}>
         <SettingsContent params={params} />
       </Suspense>
     </main>
-  );
-}
-
-async function BackLink({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  return (
-    <p className="mb-4 text-sm">
-      <Link href={`/campaigns/${encodeURIComponent(id)}`} className={linkClass}>
-        ← Back to campaign
-      </Link>
-    </p>
   );
 }

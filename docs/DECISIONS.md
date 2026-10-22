@@ -34,7 +34,8 @@ The app is called Tablekeep. Downloads were numbered 1.N.0 through Phase 1
 and 2.N.0 through Phase 3. From Phase 4 they are numbered 3.N.P: N goes up
 by 1 for each build step (4a = 3.1.0, 4b = 3.2.0) and P by 1 for each small
 fix in between (3.1.1, 3.1.2 …), resetting at the next step. From Phase 5
-they are 4.N.P in the same way (5a = 4.1.0, 5b = 4.2.0). `VERSION`,
+they are 4.N.P in the same way (5a = 4.1.0, 5b = 4.2.0), and from Phase 6
+5.N.P (6a = 5.1.0, 6b = 5.2.0, 6c = 5.3.0). `VERSION`,
 `package.json` and `CHANGELOG.md` must agree.
 
 ## ADR-009 Cache Components stay on
@@ -173,3 +174,23 @@ may also use their own published spells.
 ## ADR-036 Asking for changes requires a note
 Approve and reject may have a note; "request changes" must say what to
 change. Reviews happen once; a new submission starts a new review.
+
+## ADR-037 Campaign pages are tabs
+Overview, Party, Spells, Logs, plus DM notes, Approvals, Activity and
+Settings for DMs. Each tab is its own page and address, so links and the
+Back button work, and each loads only what it shows.
+
+## ADR-038 DM-only material is separated by the database
+DM notes have their own table readable only by DMs and Co-DMs. DM-only
+session logs are filtered by the database's read rules, so they never
+reach a player's browser even if a page has a bug.
+
+## ADR-039 The activity log is written by the database
+Triggers record important changes (members, roles, settings, reviews,
+invites, campaign spell and template lists, deleted logs and
+announcements). Nobody can write to it directly, so it can't be faked.
+Entries are skipped while a campaign is being deleted.
+
+## ADR-040 Whispers go DM ↔ players only (Phase 6b)
+Chosen as the default: DMs can whisper to any players; players can whisper
+back to DMs but not to each other.

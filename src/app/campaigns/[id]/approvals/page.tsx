@@ -1,10 +1,9 @@
 import { Suspense } from "react";
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ReviewForm } from "@/components/homebrew-forms";
 import { SheetPreview } from "@/components/sheet-view";
 import { SpellCard } from "@/components/spell-card";
-import { Badge, Card, linkClass } from "@/components/ui";
+import { Badge, Card } from "@/components/ui";
 import { requireUser } from "@/lib/auth/session";
 import { loadCampaign } from "@/lib/campaigns/queries";
 import { uuidSchema } from "@/lib/campaigns/validation";
@@ -12,6 +11,7 @@ import { loadSubmissions } from "@/lib/homebrew/queries";
 import { STATUS_LABEL } from "@/lib/homebrew/rules";
 import { coerceSpell } from "@/lib/spells/schema";
 import { coerceDefinition } from "@/lib/templates/editing";
+import { CampaignHeader } from "@/components/campaign-tabs";
 
 function when(iso: string | null): string {
   return iso ? new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "";
@@ -35,7 +35,7 @@ async function ApprovalsContent({ params }: { params: Promise<{ id: string }> })
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold break-words">{data.campaign.name}: approval queue</h1>
+      <CampaignHeader supabase={supabase} campaign={data.campaign} myRole={myRole} active="approvals" />
 
       {pending.length === 0 ? (
         <Card>
@@ -105,22 +105,8 @@ export default function ApprovalsPage({ params }: { params: Promise<{ id: string
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-10 sm:py-14">
       <Suspense fallback={<p>Loading…</p>}>
-        <BackLink params={params} />
-      </Suspense>
-      <Suspense fallback={<p>Loading…</p>}>
         <ApprovalsContent params={params} />
       </Suspense>
     </main>
-  );
-}
-
-async function BackLink({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  return (
-    <p className="mb-4 text-sm">
-      <Link href={`/campaigns/${encodeURIComponent(id)}`} className={linkClass}>
-        ← Back to campaign
-      </Link>
-    </p>
   );
 }

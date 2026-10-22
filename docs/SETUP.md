@@ -45,6 +45,7 @@ Record which ones you have run in the table below.
 | 0006_party.sql | | |
 | 0007_spells.sql | | |
 | 0008_homebrew.sql | | |
+| 0009_campaign_tools.sql | | |
 
 ## Environments
 

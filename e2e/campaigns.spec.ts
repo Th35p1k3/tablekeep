@@ -35,6 +35,7 @@ test("a DM creates a campaign, invites a player, and the player joins", async ({
     await expect(player.getByText(name)).toBeVisible();
     await player.getByRole("button", { name: "Join campaign" }).click();
     await expect(player.getByRole("heading", { name })).toBeVisible();
+    await player.getByRole("link", { name: "Party" }).click();
     await expect(player.getByTestId("member-row")).toHaveCount(2);
     await expect(player.getByRole("link", { name: "Settings" })).toHaveCount(0);
   } finally {

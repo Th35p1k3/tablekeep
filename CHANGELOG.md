@@ -1,8 +1,24 @@
 # Changelog
 
 Downloads were numbered 1.N.0 through Phase 1 and 2.N.0 through Phase 3.
-From Phase 4 they are 3.N.P, and from Phase 5 4.N.P: N for each build step,
-P for small fixes.
+From Phase 4 they are 3.N.P, from Phase 5 4.N.P and from Phase 6 5.N.P:
+N for each build step, P for small fixes.
+
+## 5.1.0 (2026-10-21)
+- Phase 6, step 6a: campaign tools.
+  - Campaign pages split into tabs: Overview, Party, Spells, Logs, and for
+    DMs: DM notes, Approvals (with a pending count), Activity, Settings.
+  - Announcements on the Overview: post, pin, edit, delete (DMs).
+  - Session logs with number, date, title and recap; visible to everyone
+    or DMs only. Players can write their own when the DM allows it.
+  - Private DM notes, optionally linked to a character or a session log.
+  - Activity log of important DM actions, recorded by the database.
+- Forms that appear more than once on a page now have unique field ids.
+- Migration 0009: announcements, session logs, DM notes, activity log.
+- Tests: rules and activity wording tests; security tests that players
+  and outsiders never see DM-only logs, DM notes or the activity log;
+  browser test with a DM and a player. Three browser tests updated for tabs.
+- Version numbering moves to 5.N.P.
 
 ## 4.2.0 (2026-10-21)
 - Phase 5, step 5b: homebrew approval.
