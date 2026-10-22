@@ -7,7 +7,10 @@ const MESSAGES: Array<[string, string]> = [
   ["version_published", "Published versions can’t be changed."],
   ["spell_in_use", "Characters still have this spell. Remove it from them first, or keep the spell."],
   ["not_published", "Only published spells can go on a character. Publish the spell first."],
-  ["spell_not_allowed", "That spell can’t be added to this character."],
+  [
+    "spell_not_allowed",
+    "This character’s campaign only allows spells approved for it. Submit the spell for approval first.",
+  ],
 ];
 
 export const GENERIC_SPELL_ERROR = "Something went wrong. Please try again.";

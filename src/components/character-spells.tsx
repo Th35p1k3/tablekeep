@@ -12,11 +12,14 @@ export function CharacterSpellsPanel({
   initialSpells,
   available,
   readOnly = false,
+  emptyHint,
 }: {
   characterId: string;
   initialSpells: CharacterSpell[];
   available: Array<{ versionId: string; label: string }>;
   readOnly?: boolean;
+  /** Shown when there's nothing to add (explains campaign rules, for example). */
+  emptyHint?: string;
 }) {
   const [spells, setSpells] = useState(initialSpells);
   const [open, setOpen] = useState<string | null>(null);
@@ -157,7 +160,9 @@ export function CharacterSpellsPanel({
             </div>
           ) : (
             <p className="text-sm text-stone-600 dark:text-stone-400">
-              {available.length ? "All your published spells are on this character." : "Publish a spell under My spells to add it here."}
+              {available.length
+                ? "Every spell this character can use is already on it."
+                : (emptyHint ?? "Publish a spell under My spells to add it here.")}
             </p>
           )}
         </div>

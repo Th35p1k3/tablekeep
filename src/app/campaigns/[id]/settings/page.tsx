@@ -17,6 +17,9 @@ import { uuidSchema } from "@/lib/campaigns/validation";
 import { ChooseAndSubmitForm } from "@/components/party-forms";
 import { offerTemplate, setPlayersSeeFullSheets, withdrawTemplate } from "@/lib/party/actions";
 import { loadMyLatestVersions, loadOfferedTemplates } from "@/lib/party/queries";
+import { addSpellToCampaign, removeSpellFromCampaign, setSpellsNeedApproval } from "@/lib/homebrew/actions";
+import { loadCampaignSpells } from "@/lib/homebrew/queries";
+import { loadMyLatestSpellVersions } from "@/lib/spells/queries";
 
 function shortDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-US", {
@@ -39,15 +42,23 @@ async function SettingsContent({ params }: { params: Promise<{ id: string }> }) 
   if (myRole === "player") redirect(`/campaigns/${campaign.id}`);
 
   const isOwner = myRole === "owner";
-  const [invites, offered, mine, visibility] = await Promise.all([
+  const [invites, offered, mine, visibility, campaignSpells, mySpells] = await Promise.all([
     loadInvites(supabase, campaign.id),
     loadOfferedTemplates(supabase, campaign.id),
     loadMyLatestVersions(supabase, user.id),
-    supabase.from("campaigns").select("players_see_full_sheets").eq("id", campaign.id).maybeSingle(),
+    supabase
+      .from("campaigns")
+      .select("players_see_full_sheets, spells_need_approval")
+      .eq("id", campaign.id)
+      .maybeSingle(),
+    loadCampaignSpells(supabase, campaign.id),
+    loadMyLatestSpellVersions(supabase, user.id),
   ]);
-  const playersSeeSheets = Boolean(
-    (visibility.data as { players_see_full_sheets?: boolean } | null)?.players_see_full_sheets,
-  );
+  const settings = visibility.data as { players_see_full_sheets?: boolean; spells_need_approval?: boolean } | null;
+  const playersSeeSheets = Boolean(settings?.players_see_full_sheets);
+  const spellsNeedApproval = settings?.spells_need_approval !== false;
+  const inCampaign = new Set(campaignSpells.map((sp) => sp.versionId));
+  const spellsToAdd = mySpells.filter((sp) => !inCampaign.has(sp.versionId));
   const offeredIds = new Set(offered.map((o) => o.versionId));
   const canOffer = mine.filter((m) => !offeredIds.has(m.versionId));
   const now = new Date();
@@ -152,6 +163,56 @@ async function SettingsContent({ params }: { params: Promise<{ id: string }> }) 
             action={setPlayersSeeFullSheets}
             fields={{ campaignId: campaign.id, allow: playersSeeSheets ? "false" : "true" }}
             label={playersSeeSheets ? "Show names only" : "Let players see full sheets"}
+          />
+        </div>
+      </Card>
+
+      <Card>
+        <h2 className="text-lg font-semibold">Spells</h2>
+        <p className="mt-1 mb-4 text-sm leading-relaxed text-stone-600 dark:text-stone-400">
+          Spells on this list can go on characters in this campaign. Add your own
+          directly; players submit theirs through the approval queue. Removing a
+          spell from the list doesn’t take it off characters that already have it.
+        </p>
+        {campaignSpells.length ? (
+          <ul className="mb-4 divide-y divide-stone-200 dark:divide-stone-700">
+            {campaignSpells.map((sp) => (
+              <li key={sp.versionId} className="flex flex-wrap items-center justify-between gap-2 py-2.5 text-sm">
+                <span>
+                  {sp.name} (version {sp.versionNumber ?? "?"})
+                </span>
+                <ActionButton
+                  action={removeSpellFromCampaign}
+                  fields={{ campaignId: campaign.id, versionId: sp.versionId }}
+                  label="Remove"
+                />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mb-4 text-sm">No spells on the list yet.</p>
+        )}
+        {spellsToAdd.length ? (
+          <ChooseAndSubmitForm
+            action={addSpellToCampaign}
+            fixed={{ campaignId: campaign.id }}
+            name="versionId"
+            label="Add one of your spells"
+            options={spellsToAdd.map((sp) => ({ value: sp.versionId, label: sp.label }))}
+            submitLabel="Add spell"
+          />
+        ) : null}
+        <div className="mt-6 border-t border-stone-200 pt-4 dark:border-stone-700">
+          <h3 className="text-sm font-semibold">Spell approval</h3>
+          <p className="mt-1 mb-3 text-sm text-stone-600 dark:text-stone-400">
+            {spellsNeedApproval
+              ? "Characters in this campaign can only use spells on the list above."
+              : "Players can also put their own published spells on their characters."}
+          </p>
+          <ActionButton
+            action={setSpellsNeedApproval}
+            fields={{ campaignId: campaign.id, required: spellsNeedApproval ? "false" : "true" }}
+            label={spellsNeedApproval ? "Let players use their own spells" : "Require approval"}
           />
         </div>
       </Card>

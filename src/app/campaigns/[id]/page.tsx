@@ -7,7 +7,14 @@ import { requireUser } from "@/lib/auth/session";
 import { leaveCampaign } from "@/lib/campaigns/actions";
 import { ChooseAndSubmitForm } from "@/components/party-forms";
 import { addCharacterToCampaign, removeCharacterFromCampaign } from "@/lib/party/actions";
-import { loadMyFreeCharacters, loadOfferedTemplates, loadParty } from "@/lib/party/queries";
+import { loadMyFreeCharacters, loadMyLatestVersions, loadOfferedTemplates, loadParty } from "@/lib/party/queries";
+import { SubmitHomebrewForm } from "@/components/homebrew-forms";
+import { SpellCard } from "@/components/spell-card";
+import { withdrawSubmission } from "@/lib/homebrew/actions";
+import { loadCampaignSpells, loadSubmissions } from "@/lib/homebrew/queries";
+import { STATUS_LABEL, encodeSubmittable } from "@/lib/homebrew/rules";
+import { loadMyLatestSpellVersions } from "@/lib/spells/queries";
+import { coerceSpell } from "@/lib/spells/schema";
 import { ROLE_LABEL, loadCampaign } from "@/lib/campaigns/queries";
 import { uuidSchema } from "@/lib/campaigns/validation";
 
@@ -22,11 +29,31 @@ async function CampaignContent({ params }: { params: Promise<{ id: string }> }) 
   const myRole = data.myRole;
   if (!myRole) notFound();
   const isManager = myRole === "owner" || myRole === "co_dm";
-  const [party, offered, freeCharacters] = await Promise.all([
-    loadParty(supabase, campaign.id),
-    loadOfferedTemplates(supabase, campaign.id),
-    loadMyFreeCharacters(supabase, user.id),
+  const [party, offered, freeCharacters, campaignSpells, mySubmissions, mySpells, myTemplates, pendingForReview] =
+    await Promise.all([
+      loadParty(supabase, campaign.id),
+      loadOfferedTemplates(supabase, campaign.id),
+      loadMyFreeCharacters(supabase, user.id),
+      loadCampaignSpells(supabase, campaign.id),
+      loadSubmissions(supabase, campaign.id, { onlyMine: user.id, limit: 20 }),
+      loadMyLatestSpellVersions(supabase, user.id),
+      loadMyLatestVersions(supabase, user.id),
+      isManager ? loadSubmissions(supabase, campaign.id, { status: "pending" }) : Promise.resolve([]),
+    ]);
+  // Things I could submit: not already approved here and not already waiting.
+  const blocked = new Set([
+    ...campaignSpells.map((sp) => sp.versionId),
+    ...offered.map((t) => t.versionId),
+    ...mySubmissions.filter((sub) => sub.status === "pending").map((sub) => sub.versionId),
   ]);
+  const submittable = [
+    ...mySpells
+      .filter((sp) => !blocked.has(sp.versionId))
+      .map((sp) => ({ value: encodeSubmittable("spell", sp.versionId), label: `Spell: ${sp.label}` })),
+    ...myTemplates
+      .filter((t) => !blocked.has(t.versionId))
+      .map((t) => ({ value: encodeSubmittable("template", t.versionId), label: `Sheet: ${t.label}` })),
+  ];
   const active = campaign.status === "active";
 
   return (
@@ -43,9 +70,14 @@ async function CampaignContent({ params }: { params: Promise<{ id: string }> }) 
           </div>
         </div>
         {isManager ? (
-          <Link href={`/campaigns/${campaign.id}/settings`} className={secondaryButtonClass}>
-            Settings
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <Link href={`/campaigns/${campaign.id}/approvals`} className={secondaryButtonClass}>
+              Approvals{pendingForReview.length ? ` (${pendingForReview.length})` : ""}
+            </Link>
+            <Link href={`/campaigns/${campaign.id}/settings`} className={secondaryButtonClass}>
+              Settings
+            </Link>
+          </div>
         ) : null}
       </div>
 
@@ -156,6 +188,69 @@ async function CampaignContent({ params }: { params: Promise<{ id: string }> }) 
             </p>
           </Card>
         ) : null}
+
+        <Card>
+          <h2 className="text-lg font-semibold">Campaign spells ({campaignSpells.length})</h2>
+          {campaignSpells.length === 0 ? (
+            <p className="mt-2 text-sm text-stone-600 dark:text-stone-400">
+              No spells approved yet. Players can submit their own below.
+            </p>
+          ) : (
+            <ul className="mt-3 space-y-2" data-testid="campaign-spells">
+              {campaignSpells.map((sp) => (
+                <li key={sp.versionId}>
+                  <details className="rounded-lg border border-stone-200 p-3 dark:border-stone-700">
+                    <summary className="cursor-pointer font-medium">
+                      {sp.name} <span className="text-sm font-normal text-stone-600 dark:text-stone-400">v{sp.versionNumber}</span>
+                    </summary>
+                    <div className="mt-3">
+                      <SpellCard name={sp.name} spell={coerceSpell(sp.content)} version={sp.versionNumber} />
+                    </div>
+                  </details>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
+
+        <Card>
+          <h2 className="text-lg font-semibold">Homebrew</h2>
+          <p className="mt-1 mb-4 text-sm text-stone-600 dark:text-stone-400">
+            Submit a published spell or sheet template for your DM to approve for this campaign.
+          </p>
+          {active && submittable.length ? (
+            <SubmitHomebrewForm campaignId={campaign.id} options={submittable} />
+          ) : (
+            <p className="text-sm text-stone-600 dark:text-stone-400">
+              {active ? "Publish a spell or sheet template to submit it here." : "This campaign is archived."}
+            </p>
+          )}
+          {mySubmissions.length ? (
+            <div className="mt-6">
+              <h3 className="text-sm font-semibold">Your submissions</h3>
+              <ul className="mt-2 divide-y divide-stone-200 text-sm dark:divide-stone-700" data-testid="my-submissions">
+                {mySubmissions.map((sub) => (
+                  <li key={sub.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
+                    <span className="min-w-0 break-words">
+                      <span className="font-medium">{sub.name}</span> v{sub.versionNumber ?? "?"} ·{" "}
+                      {STATUS_LABEL[sub.status]}
+                      {sub.reviewNote ? (
+                        <span className="block text-stone-600 dark:text-stone-400">DM’s note: “{sub.reviewNote}”</span>
+                      ) : null}
+                    </span>
+                    {sub.status === "pending" ? (
+                      <ActionButton
+                        action={withdrawSubmission}
+                        fields={{ campaignId: campaign.id, submissionId: sub.id }}
+                        label="Withdraw"
+                      />
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </Card>
 
         {myRole !== "owner" ? (
           <ActionButton

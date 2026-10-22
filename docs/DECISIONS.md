@@ -157,3 +157,19 @@ Version 2 feature and will reuse it.
 ## ADR-033 Effect presets are copied, not linked
 Inserting a preset copies the block into the spell. Editing or deleting a
 preset never changes existing spells.
+
+## ADR-034 Approvals are for exact versions
+A submission is for one published version. Approving a spell adds that
+version to the campaign's spell list; approving a template offers that
+version. Newer versions need their own approval; older approved versions
+keep working.
+
+## ADR-035 "Approved spells only" is a campaign setting, on by default
+With it on, characters in the campaign can only take spells on the
+campaign list (DMs add their own directly; players' go through the queue).
+Spells already on a character before it joined stay. With it off, players
+may also use their own published spells.
+
+## ADR-036 Asking for changes requires a note
+Approve and reject may have a note; "request changes" must say what to
+change. Reviews happen once; a new submission starts a new review.

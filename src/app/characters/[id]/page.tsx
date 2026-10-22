@@ -7,6 +7,7 @@ import { CharacterSheet } from "@/components/character-sheet";
 import { CharacterSpellsPanel } from "@/components/character-spells";
 import { InventoryPanel } from "@/components/inventory-panel";
 import { loadCharacterSpells, loadMyLatestSpellVersions } from "@/lib/spells/queries";
+import { loadSpellOptionsForCharacter } from "@/lib/homebrew/queries";
 import { ChooseAndSubmitForm } from "@/components/party-forms";
 import { ReadOnlySheet } from "@/components/sheet-view";
 import { Badge, Card, linkClass } from "@/components/ui";
@@ -74,11 +75,16 @@ async function CharacterContent({ params }: { params: Promise<{ id: string }> })
     );
   }
 
-  const [points, campaigns, spellOptions] = await Promise.all([
+  const [points, campaigns, ownSpells] = await Promise.all([
     loadRestorePoints(supabase, character.id),
     campaign ? Promise.resolve([] as Array<{ id: string; name: string }>) : loadMyActiveCampaigns(supabase, user.id),
     loadMyLatestSpellVersions(supabase, user.id),
   ]);
+  const { options: spellOptions, needsApproval } = await loadSpellOptionsForCharacter(supabase, campaign, ownSpells);
+  const spellHint =
+    campaign && needsApproval
+      ? `${campaign.name} only allows approved spells, and none are approved yet. Submit yours on the campaign page.`
+      : undefined;
 
   return (
     <div className="space-y-6">
@@ -147,7 +153,12 @@ async function CharacterContent({ params }: { params: Promise<{ id: string }> })
         initialPoints={points}
       />
       <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
-        <CharacterSpellsPanel characterId={character.id} initialSpells={spells} available={spellOptions} />
+        <CharacterSpellsPanel
+          characterId={character.id}
+          initialSpells={spells}
+          available={spellOptions}
+          emptyHint={spellHint}
+        />
         <InventoryPanel characterId={character.id} initialItems={items} />
       </div>
     </div>

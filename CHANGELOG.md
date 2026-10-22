@@ -4,6 +4,22 @@ Downloads were numbered 1.N.0 through Phase 1 and 2.N.0 through Phase 3.
 From Phase 4 they are 3.N.P, and from Phase 5 4.N.P: N for each build step,
 P for small fixes.
 
+## 4.2.0 (2026-10-21)
+- Phase 5, step 5b: homebrew approval.
+  - Players submit published spells and sheet templates to a campaign,
+    with an optional note, and can withdraw while waiting.
+  - DMs get an approval queue (with a pending count on the campaign page):
+    spell card or sheet preview, the player's note, and Approve / Request
+    changes / Don't approve with a note to the player.
+  - Campaign spell list on the campaign page; DMs add their own spells in
+    settings and can remove spells from the list.
+  - "Approved spells only" campaign setting (on by default) controls which
+    spells characters in the campaign can take.
+- Migration 0008: submissions, campaign spells, wider read rules for
+  reviewers and members, the campaign spell rule.
+- Tests: review rule tests; homebrew security tests; browser test of a
+  player submitting and a DM approving.
+
 ## 4.1.1 (2026-10-21)
 - The "Prepared" checkbox on a character's spells now ticks instantly and
   saves in the background, undoing itself with a message if saving fails.

@@ -44,6 +44,7 @@ Record which ones you have run in the table below.
 | 0005_characters.sql | | |
 | 0006_party.sql | | |
 | 0007_spells.sql | | |
+| 0008_homebrew.sql | | |
 
 ## Environments
 
