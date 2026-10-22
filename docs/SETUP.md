@@ -103,6 +103,8 @@ Use made-up passwords for these, never a real one.
 
 ## GitHub Actions secrets
 
+Backups use three more secrets: see `docs/RECOVERY.md`.
+
 GitHub → repository → Settings → Secrets and variables → Actions →
 New repository secret. Add the same eight names and values as `.env.local`.
 Tests that need them are skipped if they're missing.

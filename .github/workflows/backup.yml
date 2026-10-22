@@ -1,0 +1,52 @@
+name: Nightly database backup
+
+# Runs every night at 03:30 UTC, and on demand (Actions tab -> Run workflow).
+# Follows Supabase's documented CLI backup: roles, schema and data.
+on:
+  schedule:
+    - cron: "30 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+    steps:
+      - name: Check settings
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ] || [ -z "$BACKUP_PASSPHRASE" ]; then
+            echo "::error::Add SUPABASE_DB_URL and BACKUP_PASSPHRASE as repository secrets (see docs/RECOVERY.md)."
+            exit 1
+          fi
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Dump the database
+        run: |
+          mkdir backup
+          supabase db dump --db-url "$SUPABASE_DB_URL" -f backup/roles.sql --role-only
+          supabase db dump --db-url "$SUPABASE_DB_URL" -f backup/schema.sql
+          supabase db dump --db-url "$SUPABASE_DB_URL" -f backup/data.sql --use-copy --data-only
+          ls -la backup
+
+      - name: Encrypt (only someone with the passphrase can open it)
+        run: |
+          tar -czf backup.tar.gz backup
+          gpg --batch --yes --pinentry-mode loopback --symmetric --cipher-algo AES256 \
+            --passphrase "$BACKUP_PASSPHRASE" -o tablekeep-backup.tar.gz.gpg backup.tar.gz
+          rm -rf backup backup.tar.gz
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tablekeep-backup-${{ github.run_number }}
+          path: tablekeep-backup.tar.gz.gpg
+          retention-days: 14
+          if-no-files-found: error

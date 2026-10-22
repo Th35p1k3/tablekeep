@@ -1,0 +1,73 @@
+name: Restore a backup
+
+# Restores one nightly backup into the database in RESTORE_TARGET_DB_URL.
+# Use a NEW, EMPTY Supabase project as the target: for the restore drill, a
+# temporary test project; in a real emergency, the replacement project.
+on:
+  workflow_dispatch:
+    inputs:
+      backup_run_id:
+        description: "Run ID of the 'Nightly database backup' run to restore (the number at the end of that run's web address)"
+        required: true
+      confirm:
+        description: "Type RESTORE to confirm"
+        required: true
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      RESTORE_TARGET_DB_URL: ${{ secrets.RESTORE_TARGET_DB_URL }}
+      BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+    steps:
+      - name: Check settings
+        run: |
+          if [ "${{ inputs.confirm }}" != "RESTORE" ]; then echo "::error::Type RESTORE to confirm."; exit 1; fi
+          if [ -z "$RESTORE_TARGET_DB_URL" ] || [ -z "$BACKUP_PASSPHRASE" ]; then
+            echo "::error::Add RESTORE_TARGET_DB_URL and BACKUP_PASSPHRASE as repository secrets (see docs/RECOVERY.md)."
+            exit 1
+          fi
+
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ inputs.backup_run_id }}
+          github-token: ${{ github.token }}
+          pattern: tablekeep-backup-*
+          merge-multiple: true
+
+      - name: Decrypt
+        run: |
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$BACKUP_PASSPHRASE" \
+            -o backup.tar.gz -d tablekeep-backup.tar.gz.gpg
+          tar -xzf backup.tar.gz
+          ls -la backup
+
+      - name: Install the database client
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client
+
+      - name: Restore
+        run: |
+          psql --single-transaction --variable ON_ERROR_STOP=1 \
+            --file backup/roles.sql \
+            --file backup/schema.sql \
+            --command 'SET session_replication_role = replica' \
+            --file backup/data.sql \
+            --dbname "$RESTORE_TARGET_DB_URL"
+
+      - name: Check what came back
+        run: |
+          psql "$RESTORE_TARGET_DB_URL" --no-psqlrc -c "
+            select 'user accounts' as what, count(*) from auth.users
+            union all select 'profiles', count(*) from public.profiles
+            union all select 'campaigns', count(*) from public.campaigns
+            union all select 'characters', count(*) from public.characters
+            union all select 'sheet templates', count(*) from public.sheet_templates
+            union all select 'spells', count(*) from public.spells
+            union all select 'chat messages', count(*) from public.messages;"

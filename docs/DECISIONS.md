@@ -35,7 +35,8 @@ and 2.N.0 through Phase 3. From Phase 4 they are numbered 3.N.P: N goes up
 by 1 for each build step (4a = 3.1.0, 4b = 3.2.0) and P by 1 for each small
 fix in between (3.1.1, 3.1.2 …), resetting at the next step. From Phase 5
 they are 4.N.P in the same way (5a = 4.1.0, 5b = 4.2.0), and from Phase 6
-5.N.P (6a = 5.1.0, 6b = 5.2.0, 6c = 5.3.0). `VERSION`,
+5.N.P (6a = 5.1.0, 6b = 5.2.0, 6c = 5.3.0), and from Phase 7 6.N.P
+(7a = 6.1.0, 7b = 6.2.0). `VERSION`,
 `package.json` and `CHANGELOG.md` must agree.
 
 ## ADR-009 Cache Components stay on
@@ -222,3 +223,17 @@ the modifier; a player could in principle send a false one.)
 Results are seen by the DM and the roller. "Show results in chat" posts
 each result as a chat message from the roller. Players can also type in a
 result rolled with real dice; it's marked as such.
+
+## ADR-045 Export and import
+"Download my data" gives one JSON file with everything a person made, plus
+the messages and logs they wrote; never other people's data. Import adds
+characters (with a copy of their sheet template), spells, templates and
+presets to any account, one item at a time, re-checking everything and
+reusing identical templates and spells already in the account.
+
+## ADR-046 Encrypted nightly backups on GitHub
+A scheduled GitHub workflow dumps roles, schema and data with the Supabase
+CLI, encrypts the result with a passphrase only the owner holds, and keeps
+it as a workflow artifact for 14 days. A second workflow restores a chosen
+backup into an empty project and reports row counts, used for the restore
+drill and for real recoveries. Handout files are not included.

@@ -1,8 +1,32 @@
 # Changelog
 
 Downloads were numbered 1.N.0 through Phase 1 and 2.N.0 through Phase 3.
-From Phase 4 they are 3.N.P, from Phase 5 4.N.P and from Phase 6 5.N.P:
-N for each build step, P for small fixes.
+From Phase 4 they are 3.N.P, from Phase 5 4.N.P, from Phase 6 5.N.P and
+from Phase 7 6.N.P: N for each build step, P for small fixes.
+
+## 6.1.1 (2026-10-21)
+- Import: a file chosen before the page finished loading is no longer
+  ignored; it's picked up as soon as the page becomes interactive. The
+  browser tests now wait for the import screen to be ready.
+- Import: "Go to Home" uses Next.js navigation (clears a lint warning).
+
+## 6.1.0 (2026-10-21)
+- Phase 7, step 7a: your data and backups.
+  - Account → Download my data: one JSON file with your profile, templates,
+    spells, presets, characters (inventory, spells, restore points) and the
+    messages and logs you wrote.
+  - Account → Import from a file: characters, spells, templates and presets,
+    checked item by item with a progress list; identical templates and
+    spells are reused.
+  - Nightly encrypted database backups on GitHub (kept 14 days), and a
+    "Restore a backup" workflow for the restore drill and emergencies.
+  - `supabase/all-migrations.sql` (from `scripts/combine-migrations.mjs`)
+    sets up a new database in one paste.
+  - docs/RECOVERY.md rewritten: setup, drill, emergency, leaked keys.
+- No database migration in this step.
+- Tests: export/import format tests; browser tests for exporting, importing
+  a spell, and an unreadable file.
+- Version numbering moves to 6.N.P.
 
 ## 5.3.0 (2026-10-21)
 - Phase 6, step 6c: dice rolls.

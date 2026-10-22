@@ -5,7 +5,7 @@ import {
   NewPasswordForm,
   ProfileForm,
 } from "@/components/auth-forms";
-import { Card, linkClass } from "@/components/ui";
+import { Card, linkClass, primaryLinkClass, secondaryButtonClass } from "@/components/ui";
 import { requireUser } from "@/lib/auth/session";
 
 async function AccountContent() {
@@ -28,6 +28,22 @@ async function AccountContent() {
       <Card>
         <h2 className="mb-4 text-lg font-semibold">Change password</h2>
         <NewPasswordForm submitLabel="Update password" />
+      </Card>
+      <Card>
+        <h2 className="text-lg font-semibold">Your data</h2>
+        <p className="mt-1 mb-4 text-sm leading-relaxed text-stone-600 dark:text-stone-400">
+          Download everything you’ve made (characters, spells, sheet templates,
+          presets, and the messages and logs you wrote) as one file. You can
+          import characters, spells and templates from such a file into any account.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <a href="/account/export" download className={primaryLinkClass}>
+            Download my data
+          </a>
+          <Link href="/account/import" className={secondaryButtonClass}>
+            Import from a file
+          </Link>
+        </div>
       </Card>
       <Card>
         <h2 className="text-lg font-semibold text-red-800 dark:text-red-400">
